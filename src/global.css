@@ -10,32 +10,45 @@
 body,
 html {
 	@apply bg-[#ffecf42e];
+	font-family: "Fira code", "Fira Mono", Consolas, Menlo, Courier, monospace;
+	font-size: 12px;
+	line-height: 1.5;
 }
 
 input,
 select:focus,
 textarea {
-  outline: none;
+	outline: none;
 }
 
 .editor {
-  counter-reset: line;
+	counter-reset: line;
 }
 
-.editor #codeArea {
-  outline: none;
-  padding-left: 60px !important;
+.editor textarea {
+	outline: none;
+	padding-left: 60px !important;
 }
 
 .editor pre {
-  padding-left: 60px !important;
+	padding-left: 60px !important;
 }
 
 .editor .editorLineNumber {
-  position: absolute;
-  left: 0px;
-  color: #cccccc;
-  text-align: right;
-  width: 40px;
-  font-weight: 100;
+	position: absolute;
+	left: 0px;
+	color: #cccccc;
+	text-align: right;
+	width: 40px;
+	font-weight: 100;
+}
+
+.hide-scrollbar {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
