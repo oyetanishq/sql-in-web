@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import initSqlJs, { Database } from "sql.js";
+import initSqlJs, { Database, QueryExecResult } from "sql.js";
 
 import Editor from "react-simple-code-editor";
 
@@ -12,7 +12,10 @@ import sqlWasm from "/sql-wasm.wasm?url";
 
 function App() {
 	const [db, setDb] = useState<Database | null>(null);
-	const [code, setCode] = useState<string>("SELECT * FROM students;");
+	const [data, setData] = useState<QueryExecResult>();
+	const [code, setCode] = useState<string>(
+		"SELECT * FROM courses NATURAL JOIN students;"
+	);
 
 	useEffect(() => {
 		(async () => {
@@ -26,28 +29,24 @@ function App() {
 		})();
 	}, []);
 
-	useEffect(() => {
-		if (!db) return;
-
-		(window as any).db = db;
-		const { values } = db.exec("SELECT * FROM students;")[0];
-		console.table(values);
-	}, [db]);
-
 	return (
 		<div className="flex justify-center items-center min-h-[100dvh] w-full">
-			<nav className="h-[100dvh] w-16 flex justify-center items-center">
-				<span onClick={() => {
-					try {
-						db && alert(JSON.stringify(db.exec(code)));
-					} catch (e) {
-						alert((e as any).message)
-					}
-				}}>RUN</span>
+			<nav className="h-[100dvh] w-16 flex justify-center items-center cursor-pointer">
+				<span
+					onClick={() => {
+						try {
+							db && setData(db.exec(code)[0]);
+						} catch (e) {
+							alert((e as any).message);
+						}
+					}}
+				>
+					RUN
+				</span>
 			</nav>
-			<main className="h-[100dvh] w-[calc(100%-4rem)] flex justify-center items-center">
+			<main className="h-[100dvh] w-[calc(100%-4rem)] flex justify-center items-center flex-col">
 				<Editor
-					className="h-full w-full"
+					className="h-2/3 w-full"
 					value={code}
 					onValueChange={setCode}
 					highlight={(code) => highlight(code, languages.sql, "sql")}
@@ -57,6 +56,43 @@ function App() {
 					}}
 					tabSize={4}
 				/>
+				<div className="h-1/3 overflow-x-auto w-full px-2">
+					<table className="min-w-full divide-y-2 divide-[#ffecf4b8] bg-[#ffecf42e] text-sm border border-red-100 border-collapse">
+						<thead className="sticky top-0 bg-[#ffecf4a6] backdrop-blur-md">
+							<tr>
+								{data?.columns.map((value, index) => {
+									return (
+										<th
+											className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 text-left "
+											key={index}
+										>
+											{value}
+										</th>
+									);
+								})}
+							</tr>
+						</thead>
+
+						<tbody className="divide-y divide-[#ffecf4b8]">
+							{data?.values.map((row, index1) => {
+								return (
+									<tr className="odd:bg-gray-50" key={index1}>
+										{row.map((value, index2) => {
+											return (
+												<td
+													className="whitespace-nowrap px-4 py-2 font-medium text-gray-900"
+													key={index2}
+												>
+													{value}
+												</td>
+											);
+										})}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
 			</main>
 		</div>
 	);
