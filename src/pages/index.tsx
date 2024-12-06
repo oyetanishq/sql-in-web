@@ -58,25 +58,31 @@ function App() {
 
 	return (
 		<div className="flex justify-center items-center min-h-[100dvh] w-full">
-			<nav className="h-[100dvh] w-16 flex justify-center items-center border-r border-r-rose-200">
-				<span
-					onClick={() => {
-						try {
-							if (!db) return;
-							tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
-						} catch (e) {
-							alert((e as any).message);
-						}
-					}}
-					className="cursor-pointer"
-				>
-					RUN
-				</span>
-			</nav>
-			<main className="h-[100dvh] w-[calc(100%-4rem)] flex justify-center items-center flex-col">
+			<main className="h-[100dvh] w-full flex justify-center items-center flex-col">
 				<section className="h-2/3 w-full">
-					<div className="w-full h-full p-2 pl-0">
-						<div className="flex h-20 w-full"></div>
+					<div className="w-full h-full">
+						<div className="h-32 w-full flex justify-between items-center px-8">
+							<div className="h-full flex justify-center items-center">
+								<img src="/sql-in-web.png" alt="sql in web png" className="h-1/2 rounded-md border border-rose-300" />
+								<a href="/" className="ml-8 font-semibold italic text-xl hover:text-rose-400 cursor-pointer underline underline-offset-2 duration-300 transition">
+									sql in web
+								</a>
+							</div>
+							<div
+								className="h-2/5 w-28 text-gray-600 hover:text-gray-900 active:text-black border border-rose-300 hover:border-rose-400 active:border-rose-500 rounded-sm bg-rose-100 hover:bg-rose-300 active:bg-rose-400  transition duration-300 cursor-pointer flex justify-center items-center"
+								onClick={() => {
+									try {
+										if (!db) return;
+										tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
+									} catch (e) {
+										alert((e as any).message);
+									}
+								}}
+							>
+								RUN QUERY
+							</div>
+						</div>
+
 						<div className="border-b border-rose-200 flex gap-x-4 h-12 pl-8 justify-start items-center overflow-x-scroll hide-scrollbar">
 							{tabs.map(({ id, name, active }) => {
 								return (
@@ -99,7 +105,7 @@ function App() {
 							</span>
 						</div>
 
-						<div className="mt-3 h-[calc(100%-8rem)] w-full">
+						<div className="mt-3 h-[calc(100%-11rem)] w-full">
 							{tabs.map(({ id, code, active }) => {
 								return (
 									<div key={id} className={classNames("flex w-full h-full", active ? "" : "hidden")}>
@@ -122,7 +128,7 @@ function App() {
 						</div>
 					</div>
 				</section>
-				<div className="h-1/3 overflow-x-auto w-full p-3 border-t border-t-rose-200">
+				<section className="h-1/3 overflow-x-auto w-full p-3 border-t border-t-rose-200">
 					<div className="h-full w-full overflow-scroll hide-scrollbar">
 						<table className="min-w-full divide-y-2 divide-[#ffecf4b8] bg-[#ffecf42e] pb-3 text-sm border border-red-100 border-collapse selection:bg-red-200 cursor-pointer">
 							<thead className="sticky top-0 bg-[#ffecf4a6] backdrop-blur-md">
@@ -154,7 +160,7 @@ function App() {
 							</tbody>
 						</table>
 					</div>
-				</div>
+				</section>
 			</main>
 		</div>
 	);
