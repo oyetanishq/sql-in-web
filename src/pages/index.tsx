@@ -22,7 +22,7 @@ const exampleTabs: tab[] = [
 		id: 1,
 		active: true,
 		name: "All Students",
-		code: "SELECT\n    CONCAT(firstName, ' ' ,lastName) AS 'Full Name',\n    gender,\n    email,\n    image\n\nFROM students;\n",
+		code: "SELECT\n    students.id AS 'Student ID',\n    CONCAT(students.firstName, ' ', students.lastName) AS 'Full Name',\n    students.email AS 'Student Email',\n    GROUP_CONCAT(courses.code) AS 'Enrolled Courses',\n    SUM(courses.credits) AS 'Total Credits'\n\nFROM\n    students JOIN enrollments\n    ON(students.id = enrollments.student_id)\n    \n    JOIN courses\n    ON(courses.id = enrollments.course_id)\n    \nGROUP BY students.id\nORDER BY [Full Name] ASC;\n",
 	},
 	{
 		id: 2,
@@ -97,7 +97,7 @@ function App() {
 							{tabs.map(({ id, name, active }, index) => {
 								return (
 									<>
-										{index ? <div key={Math.random() * 10} className="h-full min-w-5 border-b border-rose-200" /> : ""}
+										{index ? <div key={index} className="h-full min-w-5 border-b border-rose-200" /> : ""}
 										<button
 											type="button"
 											key={id}
@@ -123,7 +123,7 @@ function App() {
 						<div className="mt-3 h-[calc(100%-11rem)] w-full">
 							{tabs.map(({ id, code, active }) => {
 								return (
-									<div key={id} className={classNames(active ? "" : "hidden")}>
+									<div key={id} className={classNames(active ? "" : "hidden", "overflow-scroll h-full w-full hide-scrollbar")}>
 										<Editor
 											className="editor"
 											value={code}
@@ -153,7 +153,7 @@ function App() {
 						onClick={() => db && saveSqlJsDatabase(db.export())}
 					/>
 				</section>
-				<section className="h-1/3 overflow-x-auto w-full p-4 border-t border-t-rose-200">
+				<section className="h-1/3 overflow-x-auto w-full p-4 border-t border-t-rose-200 backdrop-blur-md">
 					<div className="h-full w-full overflow-scroll hide-scrollbar">
 						<table className="min-w-full divide-y-2 divide-[#ffecf4b8] bg-[#ffecf42e] pb-3 text-sm border border-red-100 border-collapse selection:bg-red-200 cursor-pointer">
 							<thead className="sticky top-0 bg-[#ffecf4a6] backdrop-blur-md">

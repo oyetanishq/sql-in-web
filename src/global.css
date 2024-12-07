@@ -7,9 +7,13 @@
 	padding: 0;
 }
 
+:root {
+	--very-light-pink: #ffecf42e;
+}
+
 body,
 html {
-	@apply bg-[#ffecf42e];
+	@apply bg-[var(--very-light-pink)];
 	font-family: "Fira code", "Fira Mono", Consolas, Menlo, Courier, monospace;
 	font-size: 12px;
 	line-height: 1.5;
