@@ -1,8 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
+import { resolve } from "path";
 
 export default defineConfig({
-	plugins: [wasm(), topLevelAwait(), react()],
+	plugins: [react()],
+	resolve: {
+		alias: {
+			"@components": resolve(__dirname, "/src/components"),
+			"@lib": resolve(__dirname, "/src/lib"),
+		},
+	},
 });
