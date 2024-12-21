@@ -7,7 +7,6 @@
 ---
 
 ### **_Demo_**
-<img alt="example mac" src="./public/example-mac.png" />
+###### [_**sql-in-web.tanishqsingh.com**_](https://sql-in-web.tanishqsingh.com/)
 
----
-###### [_**sql in web.**_](https://sql-in-web.vercel.app)
+<img alt="example mac" src="./public/example-mac.png" />
