@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import initSqlJs, { Database, QueryExecResult } from "sql.js";
+import { QueryExecResult } from "sql.js";
 import QueryTable from "@components/query-table";
 import CodeEditor, { Tab } from "@components/code-editor/index";
 import saveSqlJsDatabase from "@lib/save-file";
 import { useTabsStore } from "@store/tabs";
-
-import dummySqlFile from "/database.sql?url";
-import sqlWasm from "/sql-wasm.wasm?url";
+import { useDatabaseStore } from "@store/database";
 
 export default function Home() {
-	const [db, setDb] = useState<Database | null>(null);
 	const [data, setData] = useState<QueryExecResult>();
 	const [tabs, setTabs] = useState<Tab[]>([]);
 	const { updateAllTabs, data: tabsData } = useTabsStore();
+	const { db, runQuery, exportDb, initDb } = useDatabaseStore();
 
 	useEffect(() => {
 		updateAllTabs(tabs);
@@ -20,19 +18,11 @@ export default function Home() {
 
 	useEffect(() => {
 		(async () => {
-			const sqlPromise = initSqlJs({ locateFile: () => sqlWasm });
-			const dataPromise = fetch(dummySqlFile).then((res) => res.arrayBuffer());
-
-			const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
-			const db = new SQL.Database(new Uint8Array(buf));
-
-			const tabs = Object.values(tabsData);
-
-			setTabs(tabs);
-			setDb(db);
-
+			await initDb();
+			const tabsFromStore = Object.values(tabsData);
+			setTabs(tabsFromStore);
 			try {
-				tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
+				tabsFromStore.forEach(({ active, code }) => active && setData(runQuery(code)[0]));
 			} catch (error) {
 				alert((error as any).message);
 			}
@@ -56,7 +46,7 @@ export default function Home() {
 								onClick={() => {
 									try {
 										if (!db) return;
-										tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
+										tabs.forEach(({ active, code }) => active && setData(runQuery(code)[0]));
 									} catch (e) {
 										alert((e as any).message);
 									}
@@ -70,7 +60,7 @@ export default function Home() {
 					</div>
 					<div
 						className="before:content-['Export_DB'] before:absolute before:bottom-3 before:right-3 before:px-3 before:py-2 before:transition before:duration-300 before:cursor-pointer before:border before:rounded-sm before:border-rose-300 before:hover:border-rose-400 before:active:border-rose-500 before:text-gray-600 before:hover:text-gray-900 before:active:text-black before:bg-rose-100 before:hover:bg-rose-300 before:active:bg-rose-400"
-						onClick={() => db && saveSqlJsDatabase(db.export())}
+						onClick={() => db && saveSqlJsDatabase(exportDb())}
 					/>
 				</section>
 				<section className="h-1/3 overflow-x-auto w-full p-4 border-t border-t-rose-200 backdrop-blur-md">{data && <QueryTable query={data} />}</section>
