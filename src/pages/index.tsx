@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import initSqlJs, { Database, QueryExecResult } from "sql.js";
 import QueryTable from "@components/query-table";
-import CodeEditor, { exampleTabs, tab } from "@components/code-editor";
+import CodeEditor, { Tab } from "@components/code-editor/index";
 import saveSqlJsDatabase from "@lib/save-file";
+import { useTabsStore } from "@store/tabs";
 
 import dummySqlFile from "/database.sql?url";
 import sqlWasm from "/sql-wasm.wasm?url";
@@ -10,7 +11,12 @@ import sqlWasm from "/sql-wasm.wasm?url";
 export default function Home() {
 	const [db, setDb] = useState<Database | null>(null);
 	const [data, setData] = useState<QueryExecResult>();
-	const [tabs, setTabs] = useState<tab[]>(exampleTabs);
+	const [tabs, setTabs] = useState<Tab[]>([]);
+	const { updateAllTabs, data: tabsData } = useTabsStore();
+
+	useEffect(() => {
+		updateAllTabs(tabs);
+	}, [tabs]);
 
 	useEffect(() => {
 		(async () => {
@@ -20,8 +26,16 @@ export default function Home() {
 			const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
 			const db = new SQL.Database(new Uint8Array(buf));
 
-			tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
+			const tabs = Object.values(tabsData);
+
+			setTabs(tabs);
 			setDb(db);
+
+			try {
+				tabs.forEach(({ active, code }) => active && setData(db.exec(code)[0]));
+			} catch (error) {
+				alert((error as any).message);
+			}
 		})();
 	}, []);
 
@@ -59,9 +73,7 @@ export default function Home() {
 						onClick={() => db && saveSqlJsDatabase(db.export())}
 					/>
 				</section>
-				<section className="h-1/3 overflow-x-auto w-full p-4 border-t border-t-rose-200 backdrop-blur-md">
-					{data && <QueryTable query={data}/>}
-				</section>
+				<section className="h-1/3 overflow-x-auto w-full p-4 border-t border-t-rose-200 backdrop-blur-md">{data && <QueryTable query={data} />}</section>
 			</main>
 		</div>
 	);
