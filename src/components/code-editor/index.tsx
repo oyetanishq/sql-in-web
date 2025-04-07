@@ -5,6 +5,7 @@ import { v4 as uuidV4 } from "uuid";
 import isDesktopFn from "@lib/is-desktop";
 import CodeEditorForDesktop from "@components/code-editor/desktop";
 import CodeEditorForMobile from "@components/code-editor/mobile";
+import { useDatabaseStore } from "@store/database";
 
 export type Tab = {
 	id: string;
@@ -15,6 +16,7 @@ export type Tab = {
 
 export default function CodeEditor({ tabs, setTabs, className }: { tabs: Tab[]; setTabs: Dispatch<SetStateAction<Tab[]>>; className: string | undefined }) {
 	const [isDesktop] = useState(isDesktopFn());
+	const { resetDb } = useDatabaseStore();
 
 	return (
 		<div className={className}>
@@ -42,6 +44,12 @@ export default function CodeEditor({ tabs, setTabs, className }: { tabs: Tab[]; 
 					>
 						+
 					</label>
+				</div>
+
+				<div className="h-full flex justify-start items-center border-b border-rose-200 px-4">
+					<button type="button" onClick={resetDb} className="transition duration-300 cursor-pointer bg-rose-50 border border-rose-200 hover:bg-rose-400 text-gray-600 hover:text-gray-800 flex justify-center items-center p-1 px-2">
+						reset
+					</button>
 				</div>
 			</div>
 

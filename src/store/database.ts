@@ -11,6 +11,7 @@ interface DatabaseState {
 	runQuery: (query: string) => QueryExecResult[];
 	exportDb: () => Uint8Array;
 	persistDb: () => void;
+	resetDb: () => void;
 }
 
 export const useDatabaseStore = create<DatabaseState>((set, get) => ({
@@ -57,5 +58,11 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
 		data.forEach((byte) => (binary += String.fromCharCode(byte)));
 		const base64Data = btoa(binary);
 		localStorage.setItem(LOCAL_STORAGE_KEY, base64Data);
+	},
+
+	resetDb: () => {
+		localStorage.removeItem(LOCAL_STORAGE_KEY);
+		localStorage.removeItem("sql-tabs");
+		window.location.reload();
 	},
 }));
